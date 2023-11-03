@@ -1,5 +1,7 @@
 import pygame
 import random
+import json
+import sys
 
 import map
 
@@ -7,7 +9,7 @@ WIDTH = 416
 HEIGHT = 352
 FPS = 30
 
-
+tPack = 'final_textures'
 
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
@@ -15,11 +17,25 @@ RED = (255, 0, 0)
 GREEN = (0, 255, 0)
 BLUE = (0, 0, 255)
 
-player = pygame.image.load('textures/player/player_down.png')
+# Importing Textures
 
-grass = pygame.image.load('textures/terrain/grass.png')
-stone = pygame.image.load('textures/terrain/stone.png')
-water = pygame.image.load('textures/terrain/water.png')
+f = open("textures/"+tPack+"/pack.json", 'r')
+
+try:
+  data = json.load(f)
+except:
+  print("\nERROR: No pack.json file found while loading the texture pack! If this is your texture pack, please create a new pack.json file or make sure your pack.json file is inside the textures folder and not a sub folder.")
+  sys.exit()
+
+print("Texture pack loaded!")
+
+print(f"Name: {data['name']}\nDescription: {data['description']}\nMade by {data['author']}")
+
+player = pygame.image.load(f'textures/{tPack}/player/player_down.png')
+
+grass = pygame.image.load(f'textures/{tPack}/terrain/grass.png')
+stone = pygame.image.load(f'textures/{tPack}/terrain/stone.png')
+water = pygame.image.load(f'textures/{tPack}/terrain/water.png')
 
 grass = pygame.transform.scale(grass, (32, 32))
 
@@ -56,7 +72,7 @@ directions = {
 
 offset = [0,0]
 
-player_x = 49
+player_x = 0
 player_y = 49
 
 SCROLL_TICK = -1
@@ -134,7 +150,7 @@ while running:
 
     for y in range(-1, 12):
       for x in range(-1,14):
-        print(player_x,player_y)
+        #print(player_x,player_y)
         if player_x+x-6>=0 and player_y+y-5>=0:
           try:
             screen.blit(map[player_y+y-5][player_x+x-6], (x*32-offset[0], y*32-offset[1]))
