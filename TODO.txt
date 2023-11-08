@@ -1,0 +1,10 @@
+- Add menu UI
+- Add a start screen
+- Add support for holding on move button
+- Implement NPCs
+- Add battle
+- Create some transitions
+- Add a dialogue system/signs
+- Pixelated Font
+- Character Creator
+- Modding support?

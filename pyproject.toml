@@ -8,6 +8,7 @@ authors = ["Your Name <you@example.com>"]
 python = ">=3.10.0"
 pygame = "^2.1.2"
 dearpygui = "^1.6.2"
+west-map = "^2.2"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]

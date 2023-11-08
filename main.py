@@ -1,13 +1,14 @@
 import pygame
 import random
-import json
-import sys
 
 import map as maps
+import load_textures as ld
 
 WIDTH = 416
 HEIGHT = 352
 FPS = 30
+
+devmode = True
 
 tPack = 'final_textures'
 
@@ -19,17 +20,7 @@ BLUE = (0, 0, 255)
 
 # Importing Textures
 
-f = open("textures/"+tPack+"/pack.json", 'r')
-
-try:
-  data = json.load(f)
-except:
-  print("\nERROR: No pack.json file found while loading the texture pack! If this is your texture pack, please create a new pack.json file or make sure your pack.json file is inside the textures folder and not a sub folder.")
-  sys.exit()
-
-print("Texture pack loaded!")
-
-print(f"Name: {data['name']}\nDescription: {data['description']}\nMade by {data['author']}")
+fontFiles = ld.verifyTextures(tPack)
 
 player = pygame.image.load(f'textures/{tPack}/player/player_down.png')
 
@@ -37,6 +28,9 @@ grass = pygame.image.load(f'textures/{tPack}/terrain/grass.png')
 stone = pygame.image.load(f'textures/{tPack}/terrain/stone.png')
 water = pygame.image.load(f'textures/{tPack}/terrain/water.png')
 shore_down = pygame.image.load(f'textures/{tPack}/terrain/shore_south.png')
+shore_up = pygame.image.load(f'textures/{tPack}/terrain/shore_north.png')
+shore_left = pygame.image.load(f'textures/{tPack}/terrain/shore_west.png')
+shore_right = pygame.image.load(f'textures/{tPack}/terrain/shore_east.png')
 tree = pygame.image.load(f'textures/{tPack}/terrain/tree.png')
 portal = pygame.image.load(f'textures/{tPack}/terrain/portal.png')
 
@@ -50,6 +44,7 @@ def text(msg, x, y, color, size, font):
     fontobj = pygame.font.SysFont("freesans", 36)
   msgobj = fontobj.render(msg, False, color)
   screen.blit(msgobj,(x, y))
+    
 
 solid_blocks = [grass, stone, water]
 
@@ -64,6 +59,9 @@ tileIDs = {
   0:grass,
   1:stone,
   2:shore_down,
+  3:shore_up,
+  4:shore_left,
+  5:shore_right,
   6:tree,
   99:portal
 }
@@ -87,6 +85,13 @@ screen = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Monster Battling Game 3")
 clock = pygame.time.Clock()     ## For syncing the FPS
 
+# import fonts
+pixelfont = pygame.freetype.Font(f'textures/{tPack}/fonts/{fontFiles[0]["location"]}', fontFiles[0]["size"])
+
+def cText(msg, x, y, color, font):
+  if font=='font1':
+    pixelfont.render_to(screen, (x,y),msg,color)
+
 directions = {
   'up': (0,-1),
   'down': (0,1),
@@ -97,8 +102,9 @@ directions = {
 
 offset = [0,0]
 
-player_x = 0
-player_y = 0
+# starting player coordinates
+player_x = 1
+player_y = 1
 
 SCROLL_TICK = -1
 DIRECTION = ''
@@ -155,7 +161,7 @@ def scroll(direction):
 
 ## Game loop
 
-
+mousePos = (0,0)
 
 #13 x 11
 #15 X 13 - y: 7 x: 6
@@ -186,6 +192,9 @@ while running:
                       DIRECTION='right'
                 if event.key == pygame.K_p:
                     map = maps.scenes['dev2']
+        elif event.type == pygame.MOUSEMOTION:
+            # Get the current position of the mouse
+            mousePos = pygame.mouse.get_pos()
             ##print(directions[DIRECTION][0])
             try:
                 #print(map[player_y-5][player_x-6])
@@ -226,10 +235,21 @@ while running:
           screen.blit(water, (x*32-offset[0],y*32-offset[1]))
 
     screen.blit(player, (192,160))
-    text(f'({player_x}, {player_y})', 5, 5, BLACK, 14, 'freesans')
-    text(f'{DIRECTION}', 50,5, BLACK, 15, 'freesans')
+    cText(f"FPS:{round(clock.get_fps(),1)}", 350,5,BLACK,"font1")
+
+    if devmode==True:
+      cText(f"({player_x}, {player_y})", 5,5,BLACK,'font1')
+      cText(f'{DIRECTION}', 50,5, BLACK, 'font1')
+      text(f"({mousePos[0]}, {mousePos[1]})", mousePos[0],mousePos[1], BLACK, 16, 'freesans')
     #screen.blit(grass, (0,0))
 
-    pygame.display.flip()   
+    pygame.display.flip()
+
+    if isinstance(map[player_y][player_x],list):
+      tileData = map[player_y][player_x]
+      if tileData[0]==99:
+        player_x=tileData[1][0]
+        player_y=tileData[1][1]
+        map = maps.scenes[tileData[2]]
 
 pygame.quit()

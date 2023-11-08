@@ -1,5 +1,11 @@
 {
   "name":"Vanilla Textures",
   "description":"The Vanilla textures of Monster Battling Game 3",
-  "author":"legacysk"
+  "author":"legacysk",
+  "fonts":{
+    "font1":{
+      "location":"PixeloidSans-mLxMm.ttf",
+      "size":14
+    }
+  }
 }
